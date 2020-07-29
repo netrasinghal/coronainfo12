@@ -4,7 +4,7 @@ const {WebhookClient} = require('dialogflow-fulfillment');
 const {Card, Suggestion} = require('dialogflow-fulfillment');
 const mysql = require('mysql');
 
-exports.FirstBot = functions.https.onRequest((request, response) => {
+exports.chatbot = functions.https.onRequest((request, response) => {
     const agent = new WebhookClient({ request, response });
 
 function connectToDB(){
@@ -46,6 +46,6 @@ function handleReadFromMySQL(agent){
 }
 
 let intentMap = new Map();
-intentMap.set('connectdb', handleReadFromMySQL);
+intentMap.set('Default Welcome Intent - state', handleReadFromMySQL);
 agent.handleRequest(intentMap);
 });
