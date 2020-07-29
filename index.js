@@ -1,43 +1,51 @@
-const express = require('express')
-const mysql = require('mysql')
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const {WebhookClient} = require('dialogflow-fulfillment');
+const {Card, Suggestion} = require('dialogflow-fulfillment');
+const mysql = require('mysql');
 
-require('dotenv').config()
+exports.FirstBot = functions.https.onRequest((request, response) => {
+    const agent = new WebhookClient({ request, response });
 
-const app=express()
-
-app.use(express.json())
-
-app.post('/connectdb',(req,res)=>{
-    const state=req.queryResult.perameter.state
-    var msg=''
-    
+function connectToDB(){
     const connection = mysql.createConnection({
         host:'localhost',
         user:'root',
         password:'password',
         database:'corona_data'
-    })
-    
-    connection.query('select * from corona_tb', (error,results,fields)=>{
-        resolve(results)
-    })
-    results.map(user=>{
-        if(state===user.State){
-            msg='Okay! So the toal number of cases for ${user.state} are ${user.Cases}. Active cases are ${user.Active}. Recovered cases are ${user.Recovered}. Total deaths are ${user.Deaths}'
-            return res.json({
-                fulfillmenttext: msg,
-                source: 'connectdb'
-            })
-        }
-        else
-        {
-            msg='Invalid Email ID!'
-            return res.json({
-                fulfillmenttext: msg,
-                source: 'connectdb'
-            })
-        }
     });
-    connection.end()
-})
+    return new Promise((resolve,reject)=>{
+        connection.connect();
+        resolve(connection);
+    });
+}
 
+function queryDB(connection){
+    return new Promise((resolve,reject)=>{
+        connection.query('select * from corona_tb', (error,results,fields)=>{
+            resolve(results);
+        });
+    });
+}
+
+function handleReadFromMySQL(agent){
+    const state = agent.parameters.state;
+    return connectToDB()
+    .then(connection=>{
+        return queryDB(connection)
+        .then(result=>{
+            console.log(result);
+            result.map(user=>{
+                if(state===user.State){
+                    agent.add('Okay! So the toal number of cases for ${user.state} are ${user.Cases}. Active cases are ${user.Active}. Recovered cases are ${user.Recovered}. Total deaths are ${user.Deaths}');
+                }
+            });
+            connection.end();
+        });
+    });
+}
+
+let intentMap = new Map();
+intentMap.set('connectdb', handleReadFromMySQL);
+agent.handleRequest(intentMap);
+});
