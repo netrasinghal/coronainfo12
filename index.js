@@ -46,6 +46,6 @@ function handleReadFromMySQL(agent){
 }
 
 let intentMap = new Map();
-intentMap.set('Default Welcome Intent', handleReadFromMySQL);
+intentMap.set('Default Welcome Intent - state', handleReadFromMySQL);
 agent.handleRequest(intentMap);
 });
