@@ -49,7 +49,7 @@ console.log(err);
       {
          var msg="Okay! So the total number of cases for "+ result[0].State + "are "+ result[0].Cases + ". Active cases are "+ result[0].Active+". Recovered cases are "+ result[0].Recovered+". Total deaths are "+ result[0].Deaths
             return res.json({
-                fulfillmenttext: msg,
+                fulfillmentText: msg,
                 source: 'chatbot'
             })
         }
