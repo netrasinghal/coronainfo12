@@ -2,6 +2,12 @@ const express = require('express')
 var mysql = require('mysql')
 
 const app=express()
+const port = process.env.PORT
+const DBname = process.env.DBname
+const DBuserName = process.env.DBuserName
+const DBpass = process.env.DBpass
+const DBhost = process.env.DBhost
+const DBport = process.env.DBport
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -13,11 +19,11 @@ app.get('/',(req,res) =>{
 function connectDB()
 {
     var con=mysql.createConnection({
-		host: 'localhost',
-		port: '3306',
-		user: 'root',
-		password: 'password',
-		database: 'corona_data'
+		host: DBhost,
+		port: DBport,
+		user: DBuserName,
+		password: DBpass,
+		database: DBname
     })
     return con
 }
@@ -57,4 +63,4 @@ console.log(err);
       })
     });
 })
-app.listen(3000, () => { console.log('Server running on port 3000!') })
+app.listen(port, () => { console.log(`Server running on port number: ${port}`) })
